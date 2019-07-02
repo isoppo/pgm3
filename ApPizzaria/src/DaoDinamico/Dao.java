@@ -15,6 +15,9 @@ public class Dao {
     static ArrayList<Staff> staffs = new ArrayList();
     static ArrayList<Cliente> clientes = new ArrayList();
     static ArrayList<Produto> cardapio= new ArrayList();
+    static ArrayList<Atendimento> atendimentos= new ArrayList();
+    static ArrayList<Atendimento> atendimentosAbertos= new ArrayList();
+    static ArrayList<Atendimento> atendimentosEncerrado= new ArrayList();
     
     public Dao() {
         //popular o cardápio Produto(float preco, String descricao, float quantidade, String unidade)
@@ -40,38 +43,117 @@ public class Dao {
         
         //popular o cadastro de funcionarios Staff( String nome, String cpf, String endereco, String telefone, String Funcao ) {
         staffs.add(new Staff("Fabio Silva", "000.555.333-11", "Rua das Favas, 123", "99941-5510", "Atendente"));
+        
+        //public void MontaPessoas() {
+        for(int i=0; i<staffs.size();i++) {
+        pessoas.add(staffs.get(i));}
+        for(int i=0; i<clientes.size();i++) {
+        pessoas.add(clientes.get(i));}
     }
     
-    
+    /**
     // manipulação de pessoas
-    public ArrayList<Pessoa> retornarPessoas() {
+    //public ArrayList<Pessoa> retornarPessoas() {
+    public void MontaPessoas() {
         for(int i=0; i<staffs.size();i++) {
         pessoas.add(staffs.get(i));}
         for(int i=0; i<clientes.size();i++) {
         pessoas.add(clientes.get(i));}
         
-        return pessoas;
+        //return pessoas;
     }
-
+    */
+    public void SalvaAtendimento(Atendimento p) {
+        this.atendimentos.add(p);
+    }
+    
+    public ArrayList<Atendimento> getAtendimentos() {
+         return atendimentos;
+    }
+    
+    public ArrayList<Atendimento> getAtendimentosAbertos() {
+        ArrayList<Atendimento> abertos = new ArrayList();
+        for (Atendimento aten : atendimentos){
+            if(aten.getStatusAtendimento().equals("Fechado")){
+            } else {
+                abertos.add(aten);
+            }
+        }
+        this.atendimentosAbertos = abertos;
+         return abertos;
+    }
+    
+    public ArrayList<Atendimento> getAtendimentosEncerrado() {
+        ArrayList<Atendimento> fechado = new ArrayList();
+        for (Atendimento aten : atendimentos){
+            if(aten.getStatusAtendimento().equals("Fechado")){
+            fechado.add(aten);
+            }
+        }
+        this.atendimentosEncerrado = fechado;
+         return fechado;
+    }
+    
+    
+    public void SalvaPessoa(Pessoa p) {
+        String cpf = p.getcpf();
+        String cpfNum = cpf.replace("-", "").replace(".", "");
+        cpf = (cpfNum.substring(0, 3) +"." + cpfNum.substring(3, 6) +"." + cpfNum.substring(6, 9) +"-"+ cpfNum.substring(9, 11));
+        p.setcpf(cpf);
+     //  cadastra pessoa
+        if (!existePessoaPorCPF(cpf)) {
+            // adicionar a nova pessoa
+            adicionarPessoa(p);
+        } else { // atualiza cadastro da pessoa
+            atualizarPessoa(p);
+            
+        }
+    }
+    
+        
+    
     public void adicionarPessoa(Pessoa p) {
         pessoas.add(p);
     }
 
+    /**
     public Pessoa retornarPessoaAcessoAbsoluto(int i) {
         return pessoas.get(i);
     }
 
     public int retornarQuantidadeDePessoas() {
         return pessoas.size();
-    }
+    }**/
     
-    public Pessoa buscarPessoaPorCPF(String cpf) {
+    public Cliente buscarPessoaPorCPF(String cpf) {
+        
+        String cpfPesssaNum;      
         for (Pessoa p : pessoas) {
+            cpfPesssaNum = p.getcpf().replace("-", "").replace(".", "");;
             if (p.getcpf().equals(cpf)) {
-                return p;
+                return (Cliente)p;
+            } else {
+                if ( cpfPesssaNum.equals(cpf) ){
+                    return (Cliente)p;
+                }
             }
         }
-        return new ClienteBalcao("nao encontrado", cpf);
+        return new Cliente("Nao Encontrado", cpf, "","");
+    }
+    
+    public Staff buscarStaffPorCPF(String cpf) {
+        String cpfPesssaNum;      
+        for (Pessoa p : staffs) {
+            cpfPesssaNum = p.getcpf().replace("-", "").replace(".", "");;
+            if (p.getcpf().equals(cpf)) {
+                return (Staff)p;
+            } else {
+                if ( cpfPesssaNum.equals(cpf) ){
+                    return (Staff)p;
+                }
+            }
+        }
+        return new Staff("Nao Encontrado", cpf, "","","");
     }
     
     public boolean existePessoaPorNome(String nomeProcurado) {
@@ -94,7 +176,24 @@ public class Dao {
         }
         // não achou? retorna falso
         return false;
-        
+    }
+    
+    public void atualizarPessoa(Pessoa p) {
+        // sinaliza que será feita uma busca
+        int ondeMudar = -1;
+        // busca a pessoa pelo nome
+        for (int i = 0; i < pessoas.size(); i++) {
+            if (pessoas.get(i).getcpf().equals(p.getcpf())) {
+                ondeMudar = i;
+                break;
+            }
+        }
+        // se achou a pessoa pra mudar
+        if (ondeMudar >= 0) {
+            pessoas.set(ondeMudar, p);
+            
+            
+        }
     }
     
     public ArrayList<Produto> retornarCardapio() {

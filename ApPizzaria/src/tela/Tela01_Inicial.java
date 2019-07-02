@@ -1,14 +1,17 @@
 
 package tela;
 import Objetos.*;
+import DaoDinamico.Dao;
 /**
  * @author Felipe-Isoppo
  */
 public class Tela01_Inicial extends javax.swing.JFrame {
 
+    Dao dao = new Dao();
     /**
      * Creates new form Tela01_Inicial
      */
+    
     public Tela01_Inicial() {
         initComponents();
         setLocationRelativeTo(null);
@@ -186,7 +189,19 @@ public class Tela01_Inicial extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void brRegistroAtendimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_brRegistroAtendimentoActionPerformed
-        Tela02_RegistroAtendimento.iniciarTela02();
+        //Tela02_RegistroAtendimento.iniciarTela02();
+        //dao.MontaPessoas();
+        
+        // criar nova instância da tela 2
+        Tela02_RegistroAtendimento tela2 = new Tela02_RegistroAtendimento(this, true, dao);
+        // associar o DAO da tela2 ao DAO desta janela(tela1) 
+        this.dao = tela2.dao;
+        // associar combobox para poder atualizar quando fechar a janela modal
+        tela2.papai = this;
+        // tornar a janela visível
+        tela2.setVisible(true);
+        
+        
     }//GEN-LAST:event_brRegistroAtendimentoActionPerformed
 
     /**

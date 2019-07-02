@@ -4,7 +4,7 @@ package Objetos;
 /**
  * @author Felipe-Isoppo
  */
-public class Cliente extends ClienteBalcao {
+public class Cliente extends Pessoa {
     
     private String endereco;
     private String telefone;

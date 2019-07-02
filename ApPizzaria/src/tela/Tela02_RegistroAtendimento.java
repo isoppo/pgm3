@@ -1,24 +1,93 @@
 
 package tela;
+import Objetos.*;
+import DaoDinamico.Dao;
+import java.util.ArrayList;
+import javax.swing.DefaultListModel;
 
 /**
  * @author Felipe-Isoppo
  */
-public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
-
+public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
+    
     /**
      * Creates new form Tela02_RegistroAtendimento
      */
     
+        // instância de acesso aos dados (vínculo feito pela janela pai)
+    public Dao dao;
+    // Dao dao = new Dao();
+    // referência à janela pai (vínculo feito pela janela pai)
+    public Tela01_Inicial papai;
+    
+    //registro de atendimentos do dao
+    ArrayList<Atendimento> atendimentosDao; // = dao.getAtendimentos();
+    
+    // contador inicial de atendimentos do caixa, re-inicia a contagem em 1 toda
+    // vez que o caixa é iniciado.
     int idAtendimento=1;
     
-    public Tela02_RegistroAtendimento(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    // inicia o registro de atendimentos do caixa
+    //ArrayList<Atendimento> atendimentos = new ArrayList();
+    Atendimento at;
+   
+    Staff atendente;
+    
+    public Tela02_RegistroAtendimento(java.awt.Frame parent, boolean modal, Dao dao) {
+        //super(parent, modal);
+        this.dao=dao;
         initComponents();
         setLocationRelativeTo(null);
+        jPanel2.setEnabled(false);
+        jPanel3.setEnabled(false);
+        btCadastrarPedido.setEnabled(false);
+        btFecharCaixa.setEnabled(false);
+        textAreaDetalhePedido.setEnabled(false);
+        bradioPedidiosFechados.setEnabled(false);
+        bradioPedidiosAbertos.setEnabled(false);
+        listaDePedidos.setEnabled(false);
+        btEditarPedido.setEnabled(false);
+        btCancelarPedido.setEnabled(false);
+        //cria uma lista vazia para adicionar os itens do pedido
+        listaDePedidos.setModel(new DefaultListModel());
+        
+        bradioPedidiosAbertos.setSelected(true);
+        bradioPedidiosFechados.setSelected(false);
+       
         
         //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    
+    public void AtualizaListPedido(ArrayList<Atendimento> atendimentos){
+        
+        //atendimentosDao = dao.getAtendimentos();
+        //Atendimento atendido = dao.getAtendimentos().get(atendimentos.size()-1);
+        //Atendimento atendido = atendimentosDao.get(0);
+        if (bradioPedidiosFechados.isSelected()) {
+            atendimentos = dao.getAtendimentosEncerrado();
+        }
+        
+        
+        //cria uma lista vazia para adicionar os itens do pedido
+        listaDePedidos.setModel(new DefaultListModel());
+        for (Atendimento aten : atendimentos){
+            //cria uma lista temporaria
+            DefaultListModel tmp = (DefaultListModel) listaDePedidos.getModel();
+        
+            // adiciona no fim na lista auxiliar
+            String x = String.format("%2s - %-10s", aten.getidAtendimento(), aten.getCliente().getNome());
+            tmp.add(tmp.getSize(), x);
+            // reconfigurar itens da lista (inclui lista temporaria na tela)
+            listaDePedidos.setModel(tmp);
+        }
+        
+        /*
+        System.out.println(""+at.getidAtendimento()+ " Cliente: "+at.getCliente() + " hora:" + at.getDataAtendimento());
+        for (Atendimento p : atendimentosDao){
+            System.out.println(""+p.getidAtendimento()+ " Cliente: "+p.getCliente() + " hora:" + p.getDataAtendimento());
+        }*/
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -44,12 +113,14 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
         jScrollBar2 = new javax.swing.JScrollBar();
         btEditarPedido = new javax.swing.JButton();
         btCancelarPedido = new javax.swing.JButton();
+        btMostrarPedido = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPasswordField1 = new javax.swing.JPasswordField();
-        jTextField1 = new javax.swing.JTextField();
+        textCpf = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btLoginOk = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
 
         jRadioButton1.setText("jRadioButton1");
 
@@ -57,7 +128,6 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
         setAlwaysOnTop(true);
         setBackground(new java.awt.Color(255, 255, 255));
         setForeground(new java.awt.Color(255, 255, 255));
-        setLocationByPlatform(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -109,9 +179,19 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
         bradioPedidiosAbertos.setFont(new java.awt.Font("Lucida Grande", 0, 12)); // NOI18N
         bradioPedidiosAbertos.setText("Pedidos Abertos");
         bradioPedidiosAbertos.setToolTipText("");
+        bradioPedidiosAbertos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bradioPedidiosAbertosActionPerformed(evt);
+            }
+        });
 
         bradioPedidiosFechados.setFont(new java.awt.Font("Lucida Grande", 0, 12)); // NOI18N
         bradioPedidiosFechados.setText("Pedidos Fechados");
+        bradioPedidiosFechados.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bradioPedidiosFechadosActionPerformed(evt);
+            }
+        });
 
         jScrollPane1.setBorder(null);
 
@@ -120,6 +200,11 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
+        });
+        listaDePedidos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                listaDePedidosMouseReleased(evt);
+            }
         });
         jScrollPane1.setViewportView(listaDePedidos);
 
@@ -154,8 +239,20 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
         jScrollBar2.getAccessibleContext().setAccessibleParent(jScrollPane2);
 
         btEditarPedido.setText("Editar Pedido");
+        btEditarPedido.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                btEditarPedidoMousePressed(evt);
+            }
+        });
+        btEditarPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btEditarPedidoActionPerformed(evt);
+            }
+        });
 
         btCancelarPedido.setText("Cancelar Pedido");
+
+        btMostrarPedido.setText("jButton1");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -174,20 +271,26 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
                                 .addComponent(btCancelarPedido))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(23, 23, 23)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(2, 2, 2))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(bradioPedidiosAbertos)
                         .addGap(36, 36, 36)
-                        .addComponent(bradioPedidiosFechados)))
-                .addGap(2, 2, 2))
+                        .addComponent(bradioPedidiosFechados)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btMostrarPedido)
+                        .addGap(14, 14, 14))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bradioPedidiosAbertos)
-                    .addComponent(bradioPedidiosFechados))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bradioPedidiosAbertos)
+                            .addComponent(bradioPedidiosFechados)))
+                    .addComponent(btMostrarPedido))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -210,13 +313,19 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
 
         jPasswordField1.setText("jPasswordField1");
 
-        jTextField1.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        jTextField1.setText("CPF");
+        textCpf.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
+        textCpf.setText("00055533311");
+        textCpf.setToolTipText("");
 
         jLabel2.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel2.setText("Senha:");
 
-        jButton1.setText("OK");
+        btLoginOk.setText("OK");
+        btLoginOk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btLoginOkActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -226,25 +335,30 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btLoginOk)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(textCpf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
-                    .addComponent(jButton1))
+                    .addComponent(btLoginOk))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -284,18 +398,109 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowClosing
 
     private void btCadastrarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCadastrarPedidoActionPerformed
-        //Tela03_Atendimento.iniciarTela03();
-        Tela03_Atendimento.iniciarTela03(idAtendimento);
+       
+        at = new Atendimento(idAtendimento,atendente);
+         // criar nova instância da tela 3
+        Tela03_Atendimento tela3 = new Tela03_Atendimento(new javax.swing.JFrame(), true, at, dao);
+        // associar o DAO da tela3 ao DAO desta janela(tela2) 
+        this.dao = tela3.dao;
+        // associar combobox para poder atualizar quando fechar a janela modal
+        tela3.filho = this;
+        // tornar a janela visível
+        tela3.setVisible(true);
+        
+        /*
+        System.out.print(String.valueOf(tela3.atendimento.getidAtendimento()));
+        
+        */
         idAtendimento++;
     }//GEN-LAST:event_btCadastrarPedidoActionPerformed
 
-   
+    private void btLoginOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btLoginOkActionPerformed
+
+        atendente = dao.buscarStaffPorCPF(textCpf.getText());
+        textCpf.setText(atendente.getcpf());
+        jLabel3.setText(atendente.getNome());
+        
+        if (atendente.getNome().equals("Nao Encontrado") ){
+            jPanel2.setEnabled(false);
+            jPanel3.setEnabled(false);
+            btCadastrarPedido.setEnabled(false);
+            btFecharCaixa.setEnabled(false);
+            textAreaDetalhePedido.setEnabled(false);
+            bradioPedidiosFechados.setEnabled(false);
+            bradioPedidiosAbertos.setEnabled(false);
+            listaDePedidos.setEnabled(false);
+            btEditarPedido.setEnabled(false);
+            btCancelarPedido.setEnabled(false);
+        }else{
+            jPanel2.setEnabled(true);
+            jPanel3.setEnabled(true);
+            btCadastrarPedido.setEnabled(true);
+            btFecharCaixa.setEnabled(true);
+            textAreaDetalhePedido.setEnabled(true);
+            bradioPedidiosFechados.setEnabled(true);
+            bradioPedidiosAbertos.setEnabled(true);
+            listaDePedidos.setEnabled(true);
+            btEditarPedido.setEnabled(true);
+            btCancelarPedido.setEnabled(true);
+        }
+
+        
+    }//GEN-LAST:event_btLoginOkActionPerformed
+
+    private void btEditarPedidoMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btEditarPedidoMousePressed
+        AtualizaListPedido(dao.getAtendimentos());
+    }//GEN-LAST:event_btEditarPedidoMousePressed
+
+    private void btEditarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEditarPedidoActionPerformed
+        
+        AtualizaListPedido(dao.getAtendimentos());
+        
+    }//GEN-LAST:event_btEditarPedidoActionPerformed
+
+    private void bradioPedidiosAbertosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bradioPedidiosAbertosActionPerformed
+        bradioPedidiosFechados.setSelected(false);
+        textAreaDetalhePedido.setText("");
+        AtualizaListPedido(dao.getAtendimentosAbertos());
+        
+    }//GEN-LAST:event_bradioPedidiosAbertosActionPerformed
+
+    private void bradioPedidiosFechadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bradioPedidiosFechadosActionPerformed
+        bradioPedidiosAbertos.setSelected(false);
+        textAreaDetalhePedido.setText("");
+        AtualizaListPedido(dao.getAtendimentosEncerrado());
+        
+        
+    }//GEN-LAST:event_bradioPedidiosFechadosActionPerformed
+
+    private void listaDePedidosMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaDePedidosMouseReleased
+        int selectAtend = listaDePedidos.getSelectedIndex();
+        
+        //textAreaDetalhePedido.setText(""+selectAtend);
+        if (bradioPedidiosAbertos.isSelected()) {
+            float valor = 0;
+            Atendimento atendSelec = dao.getAtendimentosAbertos().get(selectAtend);
+            String p = atendSelec.getCliente().getNome() + atendSelec.getDataAtendimento();
+            /*
+            String p = String.format("%10s CPF: %14s Data:%16s Status: %10s /n", atendSelec.getCliente().getNome(),
+                    atendSelec.getCliente().getcpf(), atendSelec.getDataAtendimento(), atendSelec.getStatusAtendimento());
+                    for (Oferta pedido : atendSelec.getPedido()){
+                        p = p + String.format("%2d %-50s %-5s %10.2f /n", pedido.getItem(), pedido.getDescricao(), pedido.getQtda(), pedido.getPreco());
+                        valor = pedido.getQtda()*pedido.getPreco()+ valor;
+                    }
+                    p = p + "valor total= " + valor;
+                    //"valor total= " + valor %10.2f produtoSelecionado, quantidadeSelecionada, prod.getPreco()));
+             */       
+            textAreaDetalhePedido.setText( p );
+            
+        }
+        
+    }//GEN-LAST:event_listaDePedidosMouseReleased
+
+   /*
     public static void iniciarTela02() {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -315,12 +520,13 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
         //</editor-fold>
 
         /* Create and display the dialog */
+        /*
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Tela02_RegistroAtendimento(new javax.swing.JFrame(), true).setVisible(true);
             }
         });
-    }
+    }*/
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton bradioPedidiosAbertos;
@@ -329,9 +535,11 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
     private javax.swing.JButton btCancelarPedido;
     private javax.swing.JButton btEditarPedido;
     private javax.swing.JButton btFecharCaixa;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btLoginOk;
+    private javax.swing.JButton btMostrarPedido;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -341,8 +549,8 @@ public class Tela02_RegistroAtendimento extends javax.swing.JDialog {
     private javax.swing.JScrollBar jScrollBar2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JList<String> listaDePedidos;
     private javax.swing.JTextArea textAreaDetalhePedido;
+    private javax.swing.JTextField textCpf;
     // End of variables declaration//GEN-END:variables
 }

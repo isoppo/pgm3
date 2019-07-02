@@ -4,20 +4,56 @@ package tela;
 import javax.swing.DefaultListModel;
 import DaoDinamico.Dao;
 import Objetos.*;
-import java.util.ArrayList;
+
 /**
  * @author Felipe-Isoppo
  */
 public class Tela03_Atendimento extends javax.swing.JDialog {
-    static int id;
+    
+    // instância de acesso aos dados (vínculo feito pela janela filho)
+    public Dao dao;
+    
+    // referência à janela pai (vínculo feito pela janela pai)
+    public Tela02_RegistroAtendimento filho;
+    
+    //public int id;
+    
+    public Atendimento atendimento; // = new Atendimento(filho.at);
+    
+    int item = 1;
+    int itemtela = 1;
     /**
      * Creates new form Tela03_Atendimento
      */
-    public Tela03_Atendimento(java.awt.Frame parent, boolean modal) {
+    public Tela03_Atendimento(java.awt.Frame parent, boolean modal, Atendimento at, Dao dao) {
         super(parent, modal);
+        this.dao = dao;
+        atendimento = at;
         initComponents();
-        jLabel9.setText(String.valueOf(id));
         
+        //mostra o numero do pedido (ID)
+        jLabel9.setText(String.valueOf(atendimento.getidAtendimento()));
+        
+        //inicia o atendimento selecionada a opcao de retirar produto no Balcao 
+        checkBoxRetirarNoBalcao.setSelected(true);
+        
+        //mostra o nome do atendente no formulario de pedidos
+        jLabel10.setText(atendimento.getAtendente().getNome());
+        
+        // desabilita as funcoes de registro do pedido
+            btAtribuirClienteAoPedido.setEnabled(false);
+            listPedido.setEnabled(false);
+            btCancelarItem.setEnabled(false);
+            btConlcuirAtendimento.setEnabled(false);
+            comboBoxCardapio.setEnabled(false);
+            comboBoxQtd.setEnabled(false);
+            btIncluirItemAoPedido.setEnabled(false);
+            jPanel2.setEnabled(false);
+            jPanel5.setEnabled(false);
+            checkBoxRetirarNoBalcao.setEnabled(false);
+            checkBoxDelivery.setEnabled(false);
+        
+        // localiza a janela no centro do monitor
         setLocationRelativeTo(null);
         // carrega o cardapio no combo box
         carregarCardapioNaLista(); 
@@ -26,10 +62,12 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         listPedido.setModel(new DefaultListModel());
     }
     // instância de acesso aos dados
-    Dao dao = new Dao();
-    int item = 1;
-    int itemtela = 1;
-    ArrayList<Oferta> pedido= new ArrayList();
+    //Dao dao = new Dao();
+    
+    //ArrayList<Oferta> pedido= new ArrayList();
+    
+    
+    public Atendimento getAtendimento(){return atendimento;}
     
     public void carregarCardapioNaLista() {
         // limpa itens
@@ -79,6 +117,11 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         jLabel3 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
         btAtribuirClienteAoPedido = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -120,6 +163,13 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         });
 
         btBuscarPessoa.setText("Buscar");
+        btBuscarPessoa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btBuscarPessoaActionPerformed(evt);
+            }
+        });
+
+        textCpf.setText("05194043511");
 
         textAreaEndereco.setColumns(20);
         textAreaEndereco.setRows(5);
@@ -260,10 +310,17 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         btConlcuirAtendimento.setBackground(new java.awt.Color(255, 255, 255));
         btConlcuirAtendimento.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
         btConlcuirAtendimento.setText("Concluir Atendimeto");
+        btConlcuirAtendimento.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btConlcuirAtendimentoActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Endereço:");
 
         jLabel8.setText("ID:");
+
+        jLabel10.setToolTipText("");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -281,20 +338,30 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
                                 .addComponent(btConlcuirAtendimento, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addComponent(jLabel3)
-                                .addGap(0, 384, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel13)
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addContainerGap())
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLCliente)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLFuncionario)
-                                .addGap(150, 150, 150)
-                                .addComponent(jLData)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLFuncionario)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel10)
+                        .addGap(95, 95, 95)
+                        .addComponent(jLData)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
                         .addComponent(jLabel8)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel9)
-                        .addGap(21, 21, 21))))
+                        .addGap(21, 21, 21))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLCliente)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel14)
+                        .addGap(14, 14, 14))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -304,11 +371,18 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
                     .addComponent(jLabel8)
                     .addComponent(jLFuncionario)
                     .addComponent(jLabel9)
-                    .addComponent(jLData))
+                    .addComponent(jLData)
+                    .addComponent(jLabel10)
+                    .addComponent(jLabel11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLCliente)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLCliente)
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel14))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel3)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel13))
                 .addGap(9, 9, 9)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -317,9 +391,16 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
                     .addComponent(btConlcuirAtendimento)))
         );
 
+        btConlcuirAtendimento.getAccessibleContext().setAccessibleDescription("");
+
         btAtribuirClienteAoPedido.setBackground(new java.awt.Color(255, 255, 255));
         btAtribuirClienteAoPedido.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         btAtribuirClienteAoPedido.setText("=>");
+        btAtribuirClienteAoPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAtribuirClienteAoPedidoActionPerformed(evt);
+            }
+        });
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Cardápio"));
 
@@ -380,8 +461,19 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Serviço"));
 
         checkBoxRetirarNoBalcao.setText("Retirar no Balcão");
+        checkBoxRetirarNoBalcao.setRolloverEnabled(true);
+        checkBoxRetirarNoBalcao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxRetirarNoBalcaoActionPerformed(evt);
+            }
+        });
 
         checkBoxDelivery.setText("Delivery");
+        checkBoxDelivery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxDeliveryActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -473,14 +565,16 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         
         
         //altera o valor do item para coincidir com o item do pedido e altera a quantidade, conforme pedido
-        Oferta o = new Produto(item, prod.getPreco()*quantidadeSelecionada,prod.getDescricao()+" Qtd.: "+quantidadeSelecionada,quantidadeSelecionada,prod.getUnidade());
+        Oferta o = new Produto(item, prod.getPreco()*quantidadeSelecionada,prod.getDescricao()+" Qtd.: "
+                +quantidadeSelecionada,quantidadeSelecionada,prod.getUnidade());
         //inclui item no pedido
-        pedido.add(o);
+        //pedido.add(o); 
+        atendimento.setItemPedido(o);
         
-        
+        /*
         for (Oferta p : pedido){
             System.out.println(""+p.getItem()+ " "+p.getDescricao() + " Subtotal:" + p.getPreco());
-        }
+        }*/
         
         
         //incrementa os itens do pedido
@@ -505,81 +599,141 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         listPedido.setModel(tmp);
         
         //remove o item selecionado do arrayList pedido
-        pedido = dao.removeItemPedido(posi, pedido);
+        //pedido = dao.removeItemPedido(posi, pedido);
+        atendimento.setPedido(dao.removeItemPedido(posi, atendimento.getPedido()));
         
         //pedido.remove(posi);
-        
+        /*
         for (Oferta p : pedido){
             System.out.println(""+p.getItem()+ " "+p.getDescricao() + " Subtotal:" + p.getPreco());
-        }
+        }*/
         item--;
         
     }//GEN-LAST:event_btCancelarItemActionPerformed
 
     private void btSalvarPessoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarPessoaActionPerformed
          
-        // cria a nova pessoa
+
+        
+         // cria a nova pessoa
         Pessoa novaPessoa;
-        if (textNome.getText().equals("")){
-            if (textAreaEndereco.getText().equals("")){
-                novaPessoa = (ClienteBalcao)new ClienteBalcao(textNome.getText(), textCpf.getText());
+       
+        if (textCpf.getText().equals("")){   
+          // nao salva, nao faz nada.
+        }else {
+            if (textObs.getText().equals("")){
+                novaPessoa = (Cliente)new Cliente(textNome.getText(), textCpf.getText(),  textAreaEndereco.getText(), textFone.getText());
+                dao.SalvaPessoa(novaPessoa);
+                btAtribuirClienteAoPedido.setEnabled(true);
             }else{
-                novaPessoa = (Cliente)new Cliente(textNome.getText(), textCpf.getText(), textFone.getText(), textAreaEndereco.getText());
+                novaPessoa = (Staff)new Staff(textNome.getText(), textCpf.getText(),  textAreaEndereco.getText(), textFone.getText(), textObs.getText());   
+                dao.SalvaPessoa(novaPessoa);
+                btAtribuirClienteAoPedido.setEnabled(true);
             }  
-        }else{
-            novaPessoa = (Staff)new Staff(textNome.getText(), textCpf.getText(), textFone.getText(), textAreaEndereco.getText(), textObs.getText());
         }
-        
-        
-        
-        //  cadastra pessoa
-        if (!dao.existePessoaPorCPF(textCpf.getText())) {
-            // adicionar a nova pessoa
-            dao.adicionarPessoa(novaPessoa);
-        } else { // atualiza cadastro da pessoa
-            dao.atualizarPessoa(novaPessoa);
-            
-        }
-        
-        
-        
-        
         
     }//GEN-LAST:event_btSalvarPessoaActionPerformed
 
-    public static void iniciarTela03(int idAtendimento) {
-        id = idAtendimento;
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Tela03_Atendimento.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Tela03_Atendimento.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Tela03_Atendimento.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Tela03_Atendimento.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void btBuscarPessoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btBuscarPessoaActionPerformed
+        
+        Cliente buscaPessoa = dao.buscarPessoaPorCPF(textCpf.getText());
+        // mostra na tele os dados do cpf buscado
+        textNome.setText(buscaPessoa.getNome());
+        textCpf.setText(buscaPessoa.getcpf());
+        textAreaEndereco.setText(buscaPessoa.getEndereco());
+        textFone.setText(buscaPessoa.getTelefone());
+        
+        //se o cpf nao for encontrado desabilita os botoes de registro de pedidos
+        if (textNome.getText().equals("Nao Encontrado")){ 
+            btAtribuirClienteAoPedido.setEnabled(false);
+            listPedido.setEnabled(false);
+            btCancelarItem.setEnabled(false);
+            btConlcuirAtendimento.setEnabled(false);
+            comboBoxCardapio.setEnabled(false);
+            comboBoxQtd.setEnabled(false);
+            btIncluirItemAoPedido.setEnabled(false);
+            jPanel2.setEnabled(false);
+            jPanel5.setEnabled(false);
+            checkBoxRetirarNoBalcao.setEnabled(false);
+            checkBoxDelivery.setEnabled(false);
+        }else{
+            // se o cpf for encontrado habilita o botao de incluir dados do cliente no pedido
+            btAtribuirClienteAoPedido.setEnabled(true);
         }
-        //</editor-fold>
+        
+    }//GEN-LAST:event_btBuscarPessoaActionPerformed
 
-        /* Create and display the dialog */
+    private void btAtribuirClienteAoPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAtribuirClienteAoPedidoActionPerformed
+        //atribui os dados da janela ao objeto Atendimento
+        atendimento.setCliente(new Cliente(textNome.getText(),textCpf.getText(),textAreaEndereco.getText(), textFone.getText()));
+       
+        //mostra na tela de detalhes do pedido
+        jLabel12.setText(textCpf.getText()+"-"+textNome.getText());
+        jLabel13.setText(textAreaEndereco.getText());
+        //Date data = new Date(System.currentTimeMillis());
+        jLabel11.setText(atendimento.getDataAtendimento());
+        if (checkBoxRetirarNoBalcao.isSelected()){
+            jLabel14.setText("Retirar no Balcao");
+        } else 
+        { jLabel14.setText("Entrega Motoboy");
+        }
+        
+        // habilita as funcoes de registro do pedido
+        listPedido.setEnabled(true);
+        btCancelarItem.setEnabled(true);
+        btConlcuirAtendimento.setEnabled(true);
+        comboBoxCardapio.setEnabled(true);
+        comboBoxQtd.setEnabled(true);
+        btIncluirItemAoPedido.setEnabled(true);
+        jPanel2.setEnabled(true);
+        jPanel5.setEnabled(true);
+        checkBoxRetirarNoBalcao.setEnabled(true);
+        checkBoxDelivery.setEnabled(true);
+        
+        
+        
+    }//GEN-LAST:event_btAtribuirClienteAoPedidoActionPerformed
+
+    private void checkBoxRetirarNoBalcaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxRetirarNoBalcaoActionPerformed
+        checkBoxDelivery.setSelected(false);
+        jLabel14.setText("Retirar no Balcao");
+
+    }//GEN-LAST:event_checkBoxRetirarNoBalcaoActionPerformed
+
+    private void checkBoxDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxDeliveryActionPerformed
+        checkBoxRetirarNoBalcao.setSelected(false);
+        jLabel14.setText("Entrega Motoboy");
+        
+    }//GEN-LAST:event_checkBoxDeliveryActionPerformed
+
+    private void btConlcuirAtendimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConlcuirAtendimentoActionPerformed
+        //salva este atendimento na lista de atendimentos do dao
+        dao.SalvaAtendimento(atendimento);
+        //atuliza a lista de Atendimentos na tela2
+        filho.AtualizaListPedido(dao.getAtendimentosAbertos());
+        
+        this.dispose(); //retorna para a tela anterior e deve solicitar para fechar o caixa
+        
+        //atendimento.setPedido(pedido);
+        
+        
+        
+    }//GEN-LAST:event_btConlcuirAtendimentoActionPerformed
+
+    /*public static void main(String args[]) {
+     
+    
+        // Create and display the dialog 
+    Atendimento att = new Atendimento();
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Tela03_Atendimento(new javax.swing.JFrame(), true).setVisible(true);
+                new Tela03_Atendimento(new javax.swing.JFrame(), true, att).setVisible(true);
+                 
+                
                
             }
         });
-    }
+    }*/
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAtribuirClienteAoPedido;
@@ -601,6 +755,11 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
     private javax.swing.JLabel jLNome;
     private javax.swing.JLabel jLObs;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
