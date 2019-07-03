@@ -10,19 +10,21 @@ package Objetos;
  */
 public class Produto extends Oferta {
     
-    private float quantidade;
+    private int quantidade;
     private String unidade;
     
-    public float getQuantidade() { return quantidade; }
-    public void setQuantidade(float quantidade) { this.quantidade = quantidade; }
+    public int getQuantidade() { return quantidade; }
+    public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
     public String getUnidade() { return unidade; }
     public void setUnidade(String unidade) { this.unidade = unidade; }
     
     // construtor
-    public Produto(int item, float preco, String descricao, float q , String u ) {
+    public Produto(int item, float preco, String descricao, int q , String u ) {
        super( item, preco, descricao ); quantidade = q; unidade = u;  }
     
-    public Produto(Produto p ) {
-       super( p.getItem(), p.getPreco(), p.getDescricao() ); quantidade = p.getQuantidade(); unidade = p.getUnidade();  }
+    public Produto(int item, float preco, String descricao,int qtda, int q , String u ) {
+       super( item, preco, descricao, qtda ); quantidade = q; unidade = u;  }
     
+    public Produto(Produto p ) {
+       super( p.getItem(), p.getPreco(), p.getDescricao(), p.getQtda() ); quantidade = p.getQuantidade(); unidade = p.getUnidade();  }
 }

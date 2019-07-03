@@ -8,6 +8,7 @@ import DaoDinamico.Dao;
 public class Tela01_Inicial extends javax.swing.JFrame {
 
     Dao dao = new Dao();
+    Caixa caixa;
     /**
      * Creates new form Tela01_Inicial
      */
@@ -49,6 +50,11 @@ public class Tela01_Inicial extends javax.swing.JFrame {
         btFuncionario.setFocusable(false);
         btFuncionario.setLabel("Registro de Funcionários");
         btFuncionario.setName(""); // NOI18N
+        btFuncionario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btFuncionarioActionPerformed(evt);
+            }
+        });
 
         btTerceirizado.setFocusable(false);
         btTerceirizado.setLabel("Registro de Terceirizados");
@@ -131,6 +137,11 @@ public class Tela01_Inicial extends javax.swing.JFrame {
 
         brCliente.setFocusable(false);
         brCliente.setLabel("Cadastro de Clientes");
+        brCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                brClienteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -200,9 +211,45 @@ public class Tela01_Inicial extends javax.swing.JFrame {
         tela2.papai = this;
         // tornar a janela visível
         tela2.setVisible(true);
-        
+        //Caixa caixa = new Caixa();
+        dao.SalvaCaixa(caixa);
         
     }//GEN-LAST:event_brRegistroAtendimentoActionPerformed
+
+    private void brClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_brClienteActionPerformed
+
+        //Atendimento at = new Atendimento();
+         // criar nova instância da tela 3
+        Tela03_Atendimento telaPessoas = new Tela03_Atendimento(new javax.swing.JFrame(), true, new Atendimento(), dao,false);
+        // associar o DAO da tela3 ao DAO desta janela(tela2) 
+        this.dao = telaPessoas.dao;
+        // associar combobox para poder atualizar quando fechar a janela modal
+        telaPessoas.filho1 = this;
+        // tornar a janela visível
+        telaPessoas.setVisible(true);
+        
+        
+
+
+        
+    }//GEN-LAST:event_brClienteActionPerformed
+
+    private void btFuncionarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFuncionarioActionPerformed
+
+        
+         // criar nova instância da tela 3
+        Tela03_Atendimento telaStaff = new Tela03_Atendimento(new javax.swing.JFrame(), true, new Atendimento(0 , new Staff("cadastro")), dao,false);
+        // associar o DAO da tela3 ao DAO desta janela(tela2) 
+        this.dao = telaStaff.dao;
+        // associar combobox para poder atualizar quando fechar a janela modal
+        telaStaff.filho1 = this;
+        // tornar a janela visível
+        telaStaff.setVisible(true);
+
+
+
+        
+    }//GEN-LAST:event_btFuncionarioActionPerformed
 
     /**
      * @param args the command line arguments

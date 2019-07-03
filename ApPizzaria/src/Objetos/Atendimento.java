@@ -14,7 +14,7 @@ public class Atendimento {
     
     private Date dataAtendimento; // ("dd/MM/yyyy HH:mm")
     private int idAtendimento;
-    private ArrayList<Oferta> pedido = new ArrayList();
+    private ArrayList<Produto> pedido = new ArrayList();
     private Pessoa cliente;
     private Pessoa atendente;
     private String statusAtendimento;
@@ -25,9 +25,9 @@ public class Atendimento {
     public void setDataAtendimento(Date d){this.dataAtendimento =d;}
     public String getidAtendimento() { return "" + idAtendimento;}
     
-    public void setItemPedido(Oferta d){pedido.add(d);}
-    public void setPedido(ArrayList<Oferta> d){ pedido=d;}
-    public ArrayList<Oferta> getPedido() { return pedido;}
+    public void setItemPedido(Produto d){pedido.add(d);}
+    public void setPedido(ArrayList<Produto> d){ pedido=d;}
+    public ArrayList<Produto> getPedido() { return pedido;}
     
     public Pessoa getCliente() { return cliente;}
     public void setCliente(Cliente c) { this.cliente = c;}
@@ -39,17 +39,18 @@ public class Atendimento {
     
     // construtor
     public Atendimento( ) {
-       this.dataAtendimento = new Date(System.currentTimeMillis()); this.idAtendimento = 001; statusAtendimento = "Aberto";}
+       this.dataAtendimento = new Date(System.currentTimeMillis()); this.idAtendimento = 001; statusAtendimento = "Aberto";
+        this.atendente= new Staff();  this.cliente= new Cliente(); }
     
-    public Atendimento( int id , ArrayList<Oferta> pedido) {
+    public Atendimento( int id , ArrayList<Produto> pedido) {
        this.dataAtendimento = new Date(System.currentTimeMillis()); this.idAtendimento = id; this.pedido = pedido; 
        this.cliente = null; this.atendente =null; statusAtendimento = "Aberto";}
     
-    public Atendimento( int id , ArrayList<Oferta> pedido, Pessoa cliente, Pessoa atendente) {
+    public Atendimento( int id , ArrayList<Produto> pedido, Pessoa cliente, Pessoa atendente) {
        this.dataAtendimento = new Date(System.currentTimeMillis()); this.idAtendimento = id; 
        this.pedido = pedido; this.cliente = cliente; this.atendente = atendente; statusAtendimento = "Aberto";}
     
-    public Atendimento( int id , Pessoa atendente) {
+    public Atendimento( int id , Staff atendente) {
        this.dataAtendimento = new Date(System.currentTimeMillis()); this.idAtendimento = id; 
        this.pedido = null; this.cliente = null; this.atendente = atendente; statusAtendimento = "Aberto";}
     

@@ -17,5 +17,9 @@ public class Cliente extends Pessoa {
     // construtor
     public Cliente( String nome, String cpf, String e, String t ) {
         super( nome, cpf ); endereco = e; telefone = t; }
+    
+    public Cliente(){
+        super( "", "" ); endereco = ""; telefone = "";
+    }
    
 }

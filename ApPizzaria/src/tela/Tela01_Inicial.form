@@ -104,6 +104,9 @@
             <Property name="label" type="java.lang.String" value="Registro de Funcion&#xe1;rios"/>
             <Property name="name" type="java.lang.String" value="" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btFuncionarioActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="btTerceirizado">
           <Properties>
@@ -252,6 +255,9 @@
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="label" type="java.lang.String" value="Cadastro de Clientes"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="brClienteActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

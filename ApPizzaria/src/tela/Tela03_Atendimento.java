@@ -4,6 +4,8 @@ package tela;
 import javax.swing.DefaultListModel;
 import DaoDinamico.Dao;
 import Objetos.*;
+import java.util.ArrayList;
+import javax.swing.JComponent;
 
 /**
  * @author Felipe-Isoppo
@@ -16,19 +18,22 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
     // referência à janela pai (vínculo feito pela janela pai)
     public Tela02_RegistroAtendimento filho;
     
-    //public int id;
+    public Tela01_Inicial filho1;
     
     public Atendimento atendimento; // = new Atendimento(filho.at);
     
-    int item = 1;
+    int item = 0;
     int itemtela = 1;
+    ArrayList<Produto> pedido= new ArrayList();
+    boolean ApenasCadastroPessoas = false;
+    boolean ApenasCadastroStaff = false;
     /**
      * Creates new form Tela03_Atendimento
      */
-    public Tela03_Atendimento(java.awt.Frame parent, boolean modal, Atendimento at, Dao dao) {
+    public Tela03_Atendimento(java.awt.Frame parent, boolean modal, Atendimento at, Dao dao, boolean editar) {
         super(parent, modal);
         this.dao = dao;
-        atendimento = at;
+        this.atendimento = at;
         initComponents();
         
         //mostra o numero do pedido (ID)
@@ -60,12 +65,127 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         
         //cria uma lista vazia para adicionar os itens do pedido
         listPedido.setModel(new DefaultListModel());
+        if (editar) {
+            carregarDadosPedidoNaTela(at);
+        }
+        
+        //verifica se o acesso é apenas para cadastro de pessoas via tela inicial
+        if (atendimento.getAtendente().getNome().equals("")){
+            //verifica se o acesso é apenas para cadastro de funcionarios via tela inicial
+            Staff x = (Staff)atendimento.getAtendente();
+            if (x.getFuncao().equals("cadastro")){
+                ApenasCadastroStaff=true;
+                habilitarTelaCadastroStaff();
+            }else {
+                ApenasCadastroPessoas=true;
+                habilitarTelaCadastroClientes();
+            }
+        }
+        //verifica se o acesso é apenas para cadastro de funcionarios via tela inicial
+        if (atendimento.getAtendente().getNome().equals("cadastro")){
+            ApenasCadastroStaff=true;
+            habilitarTelaCadastroStaff();
+        }
+        
     }
-    // instância de acesso aos dados
-    //Dao dao = new Dao();
     
-    //ArrayList<Oferta> pedido= new ArrayList();
+    public void habilitarTelaCadastroStaff(){
+        btAtribuirClienteAoPedido.setEnabled(false);
+        
+        listPedido.setEnabled(false);
+        btCancelarItem.setEnabled(false);
+        btConlcuirAtendimento.setEnabled(false);
+        comboBoxCardapio.setEnabled(false);
+        comboBoxQtd.setEnabled(false);
+        btIncluirItemAoPedido.setEnabled(false);
+        jPanel2.setEnabled(false);
+        jPanel5.setEnabled(false);
+        checkBoxRetirarNoBalcao.setEnabled(false);
+        checkBoxDelivery.setEnabled(false);
+        textObs.setEnabled(true);
+        jLObs.setEnabled(true);
+        jLObs.setText("Cargo/funcao:");
+        
+              
+    }
     
+    public void habilitarTelaCadastroClientes(){
+        btAtribuirClienteAoPedido.setEnabled(false);
+        
+        listPedido.setEnabled(false);
+        btCancelarItem.setEnabled(false);
+        btConlcuirAtendimento.setEnabled(false);
+        comboBoxCardapio.setEnabled(false);
+        comboBoxQtd.setEnabled(false);
+        btIncluirItemAoPedido.setEnabled(false);
+        jPanel2.setEnabled(false);
+        jPanel5.setEnabled(false);
+        checkBoxRetirarNoBalcao.setEnabled(false);
+        checkBoxDelivery.setEnabled(false);
+        textObs.setEnabled(false);
+        jLObs.setEnabled(false);
+        
+        
+    }
+    
+    public void carregarDadosFormulariDadosCliente (Cliente c){
+        Cliente buscaPessoa = c;
+        // mostra na tele os dados do cpf buscado
+        textNome.setText(buscaPessoa.getNome());
+        textCpf.setText(buscaPessoa.getcpf());
+        textAreaEndereco.setText(buscaPessoa.getEndereco());
+        textFone.setText(buscaPessoa.getTelefone());
+    }
+    
+    public void carregarDadosPedidoNaTela (Atendimento a){
+        this.atendimento=a;
+        this.pedido=a.getPedido();
+        Cliente buscaPessoa = dao.buscarPessoaPorCPF(a.getCliente().getcpf());
+        carregarDadosFormulariDadosCliente(buscaPessoa);
+        btAtribuirClienteAoPedido.setEnabled(true);
+   
+        
+        //mostra na tela de detalhes do pedido
+        jLabel12.setText(buscaPessoa.getcpf()+"-"+buscaPessoa.getNome());
+        jLabel13.setText(buscaPessoa.getEndereco());
+        
+        jLabel11.setText(a.getDataAtendimento());
+        if (checkBoxRetirarNoBalcao.isSelected()){
+            jLabel14.setText("Retirar no Balcao");
+        } else 
+        { jLabel14.setText("Entrega Motoboy");
+        }
+        
+        
+        // habilita as funcoes de registro do pedido
+        listPedido.setEnabled(true);
+        btCancelarItem.setEnabled(true);
+        btConlcuirAtendimento.setEnabled(true);
+        comboBoxCardapio.setEnabled(true);
+        comboBoxQtd.setEnabled(true);
+        btIncluirItemAoPedido.setEnabled(true);
+        jPanel2.setEnabled(true);
+        jPanel5.setEnabled(true);
+        checkBoxRetirarNoBalcao.setEnabled(true);
+        checkBoxDelivery.setEnabled(true);
+        
+        
+        //mostra os itens do pedido
+        
+        //cria uma lista temporaria
+        DefaultListModel tmp = (DefaultListModel) listPedido.getModel();
+        for (Produto prod : atendimento.getPedido()){
+            item = prod.getItem();
+            // adiciona no fim na lista auxiliar
+            String x = String.format("%2d %-50s %-5s %10.2f", item, prod.getDescricao(), prod.getQtda(), prod.getPreco());
+            tmp.add(tmp.getSize(), x);
+            // reconfigurar itens da lista (inclui lista temporaria na tela)
+            listPedido.setModel(tmp);
+            
+        } 
+        
+        itemtela = item+1;
+    }
     
     public Atendimento getAtendimento(){return atendimento;}
     
@@ -553,7 +673,6 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         //altera a quantidade do estoque no Cardapio
         dao.retiraItemDoEstoque(itemMenu, quantidadeSelecionada);
         
-        
         //cria uma lista temporaria
         DefaultListModel tmp = (DefaultListModel) listPedido.getModel();
         // adiciona no fim na lista auxiliar
@@ -562,28 +681,21 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         // reconfigurar itens da lista (inclui lista temporaria na tela)
         listPedido.setModel(tmp);
         
-        
-        
         //altera o valor do item para coincidir com o item do pedido e altera a quantidade, conforme pedido
-        Oferta o = new Produto(item, prod.getPreco()*quantidadeSelecionada,prod.getDescricao()+" Qtd.: "
-                +quantidadeSelecionada,quantidadeSelecionada,prod.getUnidade());
-        //inclui item no pedido
-        //pedido.add(o); 
-        atendimento.setItemPedido(o);
+        Produto oProd = new Produto(item+1, prod.getPreco(), prod.getDescricao(),
+                quantidadeSelecionada ,quantidadeSelecionada ,prod.getUnidade() );
         
+        //System.out.println(""+oProd.getItem()+ " "+oProd.getDescricao() + " Subtotal:" + oProd.getPreco());
+        
+        pedido.add(oProd);
         /*
         for (Oferta p : pedido){
             System.out.println(""+p.getItem()+ " "+p.getDescricao() + " Subtotal:" + p.getPreco());
         }*/
-        
-        
+ 
         //incrementa os itens do pedido
         item++;
         itemtela++;
-       
-
-        
-        
         
         
     }//GEN-LAST:event_btIncluirItemAoPedidoActionPerformed
@@ -599,10 +711,8 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         listPedido.setModel(tmp);
         
         //remove o item selecionado do arrayList pedido
-        //pedido = dao.removeItemPedido(posi, pedido);
-        atendimento.setPedido(dao.removeItemPedido(posi, atendimento.getPedido()));
-        
-        //pedido.remove(posi);
+        pedido = dao.removeItemPedido(posi, pedido);
+
         /*
         for (Oferta p : pedido){
             System.out.println(""+p.getItem()+ " "+p.getDescricao() + " Subtotal:" + p.getPreco());
@@ -612,10 +722,8 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
     }//GEN-LAST:event_btCancelarItemActionPerformed
 
     private void btSalvarPessoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarPessoaActionPerformed
-         
-
-        
-         // cria a nova pessoa
+       
+        // cria a nova pessoa
         Pessoa novaPessoa;
        
         if (textCpf.getText().equals("")){   
@@ -624,11 +732,19 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
             if (textObs.getText().equals("")){
                 novaPessoa = (Cliente)new Cliente(textNome.getText(), textCpf.getText(),  textAreaEndereco.getText(), textFone.getText());
                 dao.SalvaPessoa(novaPessoa);
-                btAtribuirClienteAoPedido.setEnabled(true);
+                if (!ApenasCadastroPessoas) {
+                    btAtribuirClienteAoPedido.setEnabled(true);
+                } else {
+                    this.dispose();
+                }
             }else{
                 novaPessoa = (Staff)new Staff(textNome.getText(), textCpf.getText(),  textAreaEndereco.getText(), textFone.getText(), textObs.getText());   
                 dao.SalvaPessoa(novaPessoa);
-                btAtribuirClienteAoPedido.setEnabled(true);
+                if (!ApenasCadastroStaff) {
+                    btAtribuirClienteAoPedido.setEnabled(true);
+                }else {
+                    this.dispose();
+                }
             }  
         }
         
@@ -638,10 +754,13 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         
         Cliente buscaPessoa = dao.buscarPessoaPorCPF(textCpf.getText());
         // mostra na tele os dados do cpf buscado
+        carregarDadosFormulariDadosCliente(buscaPessoa);
+        /*
         textNome.setText(buscaPessoa.getNome());
         textCpf.setText(buscaPessoa.getcpf());
         textAreaEndereco.setText(buscaPessoa.getEndereco());
         textFone.setText(buscaPessoa.getTelefone());
+        */
         
         //se o cpf nao for encontrado desabilita os botoes de registro de pedidos
         if (textNome.getText().equals("Nao Encontrado")){ 
@@ -658,7 +777,9 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
             checkBoxDelivery.setEnabled(false);
         }else{
             // se o cpf for encontrado habilita o botao de incluir dados do cliente no pedido
-            btAtribuirClienteAoPedido.setEnabled(true);
+            if (!ApenasCadastroPessoas) {
+                btAtribuirClienteAoPedido.setEnabled(true);
+            }
         }
         
     }//GEN-LAST:event_btBuscarPessoaActionPerformed
@@ -707,6 +828,7 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
     }//GEN-LAST:event_checkBoxDeliveryActionPerformed
 
     private void btConlcuirAtendimentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btConlcuirAtendimentoActionPerformed
+        atendimento.setPedido(pedido);
         //salva este atendimento na lista de atendimentos do dao
         dao.SalvaAtendimento(atendimento);
         //atuliza a lista de Atendimentos na tela2

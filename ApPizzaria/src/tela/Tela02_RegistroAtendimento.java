@@ -113,7 +113,6 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
         jScrollBar2 = new javax.swing.JScrollBar();
         btEditarPedido = new javax.swing.JButton();
         btCancelarPedido = new javax.swing.JButton();
-        btMostrarPedido = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPasswordField1 = new javax.swing.JPasswordField();
@@ -239,11 +238,6 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
         jScrollBar2.getAccessibleContext().setAccessibleParent(jScrollPane2);
 
         btEditarPedido.setText("Editar Pedido");
-        btEditarPedido.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                btEditarPedidoMousePressed(evt);
-            }
-        });
         btEditarPedido.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btEditarPedidoActionPerformed(evt);
@@ -251,8 +245,11 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
         });
 
         btCancelarPedido.setText("Cancelar Pedido");
-
-        btMostrarPedido.setText("jButton1");
+        btCancelarPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btCancelarPedidoActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -277,20 +274,15 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
                         .addComponent(bradioPedidiosAbertos)
                         .addGap(36, 36, 36)
                         .addComponent(bradioPedidiosFechados)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btMostrarPedido)
-                        .addGap(14, 14, 14))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(bradioPedidiosAbertos)
-                            .addComponent(bradioPedidiosFechados)))
-                    .addComponent(btMostrarPedido))
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bradioPedidiosAbertos)
+                    .addComponent(bradioPedidiosFechados))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -391,6 +383,8 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
 
     private void btFecharCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btFecharCaixaActionPerformed
         this.dispose(); //retorna para a tela anterior e deve solicitar para fechar o caixa
+        papai.caixa= new Caixa(atendimentosDao);
+        
     }//GEN-LAST:event_btFecharCaixaActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -401,13 +395,15 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
        
         at = new Atendimento(idAtendimento,atendente);
          // criar nova instância da tela 3
-        Tela03_Atendimento tela3 = new Tela03_Atendimento(new javax.swing.JFrame(), true, at, dao);
+        Tela03_Atendimento tela3 = new Tela03_Atendimento(new javax.swing.JFrame(), true, at, dao,false);
         // associar o DAO da tela3 ao DAO desta janela(tela2) 
         this.dao = tela3.dao;
         // associar combobox para poder atualizar quando fechar a janela modal
         tela3.filho = this;
         // tornar a janela visível
         tela3.setVisible(true);
+        
+        textAreaDetalhePedido.setText("");
         
         /*
         System.out.print(String.valueOf(tela3.atendimento.getidAtendimento()));
@@ -449,13 +445,30 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btLoginOkActionPerformed
 
-    private void btEditarPedidoMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btEditarPedidoMousePressed
-        AtualizaListPedido(dao.getAtendimentos());
-    }//GEN-LAST:event_btEditarPedidoMousePressed
-
     private void btEditarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btEditarPedidoActionPerformed
         
-        AtualizaListPedido(dao.getAtendimentos());
+        //AtualizaListPedido(dao.getAtendimentos());
+        
+        int selectAtend = listaDePedidos.getSelectedIndex();
+        if (selectAtend>=0){
+            if (bradioPedidiosAbertos.isSelected()) {
+                String idAtend= dao.getAtendimentosAbertos().get(selectAtend).getidAtendimento();
+                //System.out.print(idAtend);
+                
+                at =dao.getAtendimento(idAtend);
+                
+                Tela03_Atendimento tela3 = new Tela03_Atendimento(new javax.swing.JFrame(), true, at, dao, true);
+                // associar o DAO da tela3 ao DAO desta janela(tela2) 
+                this.dao = tela3.dao;
+                // associar combobox para poder atualizar quando fechar a janela modal
+                tela3.filho = this;
+                // tornar a janela visível
+                tela3.setVisible(true);
+                textAreaDetalhePedido.setText("");
+                //tela3.carregarDadosPedidoNaTela(at);
+                  
+            }          
+        }
         
     }//GEN-LAST:event_btEditarPedidoActionPerformed
 
@@ -481,22 +494,45 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
         if (bradioPedidiosAbertos.isSelected()) {
             float valor = 0;
             Atendimento atendSelec = dao.getAtendimentosAbertos().get(selectAtend);
-            String p = atendSelec.getCliente().getNome() + atendSelec.getDataAtendimento();
-            /*
-            String p = String.format("%10s CPF: %14s Data:%16s Status: %10s /n", atendSelec.getCliente().getNome(),
-                    atendSelec.getCliente().getcpf(), atendSelec.getDataAtendimento(), atendSelec.getStatusAtendimento());
+            //String p = atendSelec.getCliente().getNome() + atendSelec.getDataAtendimento();
+            
+            String p = String.format("Status: %-16s Data: %16s \nNome: %-15.12s   CPF: %14s   \n", 
+                    atendSelec.getStatusAtendimento(), atendSelec.getDataAtendimento(), 
+                    atendSelec.getCliente().getNome(),
+                    atendSelec.getCliente().getcpf() );
+                    p = p + String.format("%3s  | %10.7s   | %-5s |  %-26.24s \n",
+                            "ID", "Valor Unt.", "Qtda.", "Produto");
                     for (Oferta pedido : atendSelec.getPedido()){
-                        p = p + String.format("%2d %-50s %-5s %10.2f /n", pedido.getItem(), pedido.getDescricao(), pedido.getQtda(), pedido.getPreco());
+                        p = p + String.format("%3d  |R$%8.2f   | %5s |    %-26.24s \n", 
+                                pedido.getItem(), 
+                                pedido.getPreco(), pedido.getQtda(), 
+                                pedido.getDescricao());
                         valor = pedido.getQtda()*pedido.getPreco()+ valor;
                     }
-                    p = p + "valor total= " + valor;
+                    p = p + String.format("TOTAL= R$%4.2f", valor);
                     //"valor total= " + valor %10.2f produtoSelecionado, quantidadeSelecionada, prod.getPreco()));
-             */       
+                    
             textAreaDetalhePedido.setText( p );
             
         }
         
     }//GEN-LAST:event_listaDePedidosMouseReleased
+
+    private void btCancelarPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btCancelarPedidoActionPerformed
+        int selectAtend = listaDePedidos.getSelectedIndex();
+        if (selectAtend>=0){
+            textAreaDetalhePedido.setText("");
+            if (bradioPedidiosAbertos.isSelected()) {
+                String idAtend= dao.getAtendimentosAbertos().get(selectAtend).getidAtendimento();
+                //System.out.print(idAtend);
+                dao.removeAtendimento(idAtend);
+              
+                AtualizaListPedido(dao.getAtendimentosAbertos());
+            }else{ textAreaDetalhePedido.setText("Pedido Fechado nao pode ser Cancelado.");}
+            
+
+        }
+    }//GEN-LAST:event_btCancelarPedidoActionPerformed
 
    /*
     public static void iniciarTela02() {
@@ -536,7 +572,6 @@ public class Tela02_RegistroAtendimento extends javax.swing.JFrame {
     private javax.swing.JButton btEditarPedido;
     private javax.swing.JButton btFecharCaixa;
     private javax.swing.JButton btLoginOk;
-    private javax.swing.JButton btMostrarPedido;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

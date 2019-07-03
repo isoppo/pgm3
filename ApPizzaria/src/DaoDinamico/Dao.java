@@ -18,6 +18,7 @@ public class Dao {
     static ArrayList<Atendimento> atendimentos= new ArrayList();
     static ArrayList<Atendimento> atendimentosAbertos= new ArrayList();
     static ArrayList<Atendimento> atendimentosEncerrado= new ArrayList();
+    Caixa caixa;
     
     public Dao() {
         //popular o cardápio Produto(float preco, String descricao, float quantidade, String unidade)
@@ -63,8 +64,56 @@ public class Dao {
         //return pessoas;
     }
     */
+    public void SalvaCaixa(Caixa a){
+        this.caixa = a;
+    }
+    
+    
     public void SalvaAtendimento(Atendimento p) {
-        this.atendimentos.add(p);
+        boolean atendimentoJaExiste = false;
+        for (Atendimento atend : atendimentos){
+            if (p.getidAtendimento().equals(atend.getidAtendimento()))
+            atendimentoJaExiste = true;
+        }
+        if (!atendimentoJaExiste){
+            this.atendimentos.add(p);
+        }else{
+            SubstituiAtendimento(p);
+        }
+    }
+    
+    public void SubstituiAtendimento(Atendimento p ) {
+        String item = p.getidAtendimento();
+        //remove o atendimento (conforme o id passado por parametro) da lista de atendimentos
+        ArrayList<Atendimento> atendimentosTemp = new ArrayList();
+        for (Atendimento aten : atendimentos){
+            if(aten.getidAtendimento().equals(item)){
+                atendimentosTemp.add(p);
+            } else {
+                atendimentosTemp.add(aten);
+            }
+        }
+        this.atendimentos = atendimentosTemp;
+        
+        //atualiza a lista de atendimentos abertos
+        ArrayList<Atendimento> abertos = new ArrayList();
+        for (Atendimento aten : atendimentos){
+            if(aten.getStatusAtendimento().equals("Fechado")){
+            } else {
+                abertos.add(aten);
+            }
+        }
+        this.atendimentosAbertos = abertos; 
+    }
+    
+    public Atendimento getAtendimento(String id) {
+        Atendimento x= new Atendimento();
+        for (Atendimento atend : atendimentos){
+            if(atend.getidAtendimento().equals(id)){
+            x= atend;
+            }
+        } 
+        return x;
     }
     
     public ArrayList<Atendimento> getAtendimentos() {
@@ -83,6 +132,9 @@ public class Dao {
          return abertos;
     }
     
+    
+    
+    
     public ArrayList<Atendimento> getAtendimentosEncerrado() {
         ArrayList<Atendimento> fechado = new ArrayList();
         for (Atendimento aten : atendimentos){
@@ -92,6 +144,37 @@ public class Dao {
         }
         this.atendimentosEncerrado = fechado;
          return fechado;
+    }
+    
+    public void removeAtendimento(String item) {
+        /*
+        ArrayList<Atendimento> atendimentosTemp= new ArrayList();
+        for (int i=0; i<item-1; i++){
+            atendimentosTemp.add(atendimentos.get(i));
+        }
+        for (int i=item; i<atendimentos.size(); i++){
+        atendimentosTemp.add(atendimentos.get(i));
+        } */
+        
+        //remove o atendimento (conforme o id passado por parametro) da lista de atendimentos
+        ArrayList<Atendimento> atendimentosTemp = new ArrayList();
+        for (Atendimento aten : atendimentos){
+            if(aten.getidAtendimento().equals(item)){
+            } else {
+                atendimentosTemp.add(aten);
+            }
+        }
+        this.atendimentos = atendimentosTemp;
+        
+        //atualiza a lista de atendimentos abertos
+        ArrayList<Atendimento> abertos = new ArrayList();
+        for (Atendimento aten : atendimentos){
+            if(aten.getStatusAtendimento().equals("Fechado")){
+            } else {
+                abertos.add(aten);
+            }
+        }
+        this.atendimentosAbertos = abertos; 
     }
     
     
@@ -211,23 +294,33 @@ public class Dao {
     
     public void retiraItemDoEstoque(int item, int quantidade) {
         Produto p = new Produto(cardapio.get(item));
-        p.setQuantidade(p.getQuantidade() - (float)quantidade);
+        p.setQuantidade(p.getQuantidade() - quantidade);
         cardapio.add(item, p);
 
     }
+    //public void setItemPedido(Produto d){pedido.add(d);}
     
-    public ArrayList<Oferta> removeItemPedido(int item, ArrayList<Oferta> p) {
-        ArrayList<Oferta> pedido = new ArrayList();
+    
+    
+    
+    
+    public ArrayList<Produto> removeItemPedido(int item, ArrayList<Produto> p) {
+        ArrayList<Produto> pedido = new ArrayList();
         for (int i=0; i<item; i++){
-        Produto prod = new Produto((Produto)p.get(i));
+        Produto prod = new Produto(p.get(i));
         pedido.add(prod);
         }
         for (int i=item+1; i<p.size(); i++){
-        Produto prod = new Produto((Produto)p.get(i));
+        Produto prod = new Produto(p.get(i));
         prod.setItem(i);
         pedido.add(prod);
         }
         return pedido;
     }
+    
+    
+    
+    
+    
     
 }
