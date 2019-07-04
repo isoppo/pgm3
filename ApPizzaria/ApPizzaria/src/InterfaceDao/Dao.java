@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * @author Felipe-Isoppo
  */
-public interface Dao {
+public interface Dao  {
     
     public void SalvaCaixa(Caixa a);
     

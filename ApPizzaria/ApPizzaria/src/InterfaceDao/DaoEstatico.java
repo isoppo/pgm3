@@ -1,14 +1,29 @@
 
 package InterfaceDao;
-import java.util.ArrayList;
+
 import Objetos.*;
+
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
  * @author Felipe-Isoppo
  */
 public class DaoEstatico implements Dao {
     
-    // objetos estáticos, para que quaisquer instâncias do DAO
-    // acessem os mesmos dados
+    //DaoAF(String caminhoArquivo)
+    DaoAF AF; 
+    // configuração específica do DAO dump binário:
+    String caminhoArquivo = "/Users/Felipe-Isoppo/Documents/Curso/dados.bin";
+    
+    String caminhoArquivoCaixa = "/Users/Felipe-Isoppo/Documents/Curso/caixa.bin";
+    // variáveis para uso *** interno e temporário *** do DAO
+    HashMap dados = new HashMap();
+    // objetos estáticos, para que quaisquer instâncias do DAO acessem os mesmos dados
     static ArrayList<Pessoa> pessoas = new ArrayList();
     static ArrayList<Staff> staffs = new ArrayList();
     static ArrayList<Cliente> clientes = new ArrayList();
@@ -17,8 +32,55 @@ public class DaoEstatico implements Dao {
     static ArrayList<Atendimento> atendimentosAbertos= new ArrayList();
     static ArrayList<Atendimento> atendimentosEncerrado= new ArrayList();
     private Caixa caixa;
+
+    public void EscreveDadosHashMap(){
+        dados.clear();
+        //inclui dados no objeto HashMap
+        //dados.put("Pessoa", pessoas);
+        dados.put("staff", staffs);
+        dados.put("cliente", clientes);
+        dados.put("produto", cardapio);
+        dados.put("atendimento", atendimentos);
+    }
     
+    public void LeDadosHashMap(HashMap tmp){
+        // retorna dados
+        //pessoas = (ArrayList<Pessoa>) tmp.get("Pessoa");
+        staffs = (ArrayList<Staff>) tmp.get("staff");
+        clientes = (ArrayList<Cliente>) tmp.get("cliente");
+        cardapio = (ArrayList<Produto>) tmp.get("produto");
+        atendimentos = (ArrayList<Atendimento>) tmp.get("atendimento");
+    }
+    
+    public void SalvaDadosEmArquivo(){
+        //fazer um copia dos objetos no objeto "dados"
+        EscreveDadosHashMap();
+        //salva dados no arquivo
+        AF.salvarDadosNoDisco(dados);
+    }
+    
+    // inicialização do DAO: popular cadastros, se o arquivo não existir
     public DaoEstatico() {
+        AF = new DaoAF(caminhoArquivo);
+        Path path = Paths.get(caminhoArquivo);
+        if (!Files.exists(path)) {
+            popularDados();
+            //fazer um copia dos objetos no objeto "dados"
+            EscreveDadosHashMap();
+            
+            //salva dados no arquivo
+            AF.salvarDadosNoDisco(dados);
+        }else{
+            //carreda os dados do arquivo para o objeto "dados"
+            dados=AF.carregarDadosDoDisco();
+            
+            //atribui os dados à cada objeto statico contido no objeto "dados"
+            LeDadosHashMap(dados);
+        }
+         
+    }
+    
+    void popularDados() {
         //popular o cardápio Produto(float preco, String descricao, float quantidade, String unidade)
         cardapio.add(new Produto(1, 10, "Coca Cola 2l", 20, "unid"));
         cardapio.add(new Produto(2, 5, "Coca Cola 600ml", 20, "unid"));
@@ -46,9 +108,22 @@ public class DaoEstatico implements Dao {
         MontaListaPessoa();
     }
     
+    
+    
+    public void MontaListaPessoa(){
+        pessoas.clear();
+        for(int i=0; i<staffs.size();i++) {
+        pessoas.add(staffs.get(i));}
+        for(int i=0; i<clientes.size();i++) {
+        pessoas.add(clientes.get(i));}
+    }
   
     public void SalvaCaixa(Caixa a){
         this.caixa = a;
+        DaoAF AFCaixa = new DaoAF(caminhoArquivoCaixa);
+        HashMap dadosCaixa = new HashMap();
+        dadosCaixa.put("Caixa", a);
+        AFCaixa.salvarDadosNoDisco(dadosCaixa);
     }
     
     public Caixa ExtratoCaixa(){
@@ -66,6 +141,9 @@ public class DaoEstatico implements Dao {
         }else{
             SubstituiAtendimento(p);
         }
+        
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
     
     public void SubstituiAtendimento(Atendimento p ) {
@@ -90,6 +168,9 @@ public class DaoEstatico implements Dao {
             }
         }
         this.atendimentosAbertos = abertos; 
+        
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
     
     public Atendimento getAtendimento(String id) {
@@ -154,15 +235,12 @@ public class DaoEstatico implements Dao {
             }
         }
         this.atendimentosAbertos = abertos; 
+        
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
     
-    public void MontaListaPessoa(){
-        pessoas.clear();
-        for(int i=0; i<staffs.size();i++) {
-        pessoas.add(staffs.get(i));}
-        for(int i=0; i<clientes.size();i++) {
-        pessoas.add(clientes.get(i));}
-    }
+    
     
     public String formataCPF(String cpf){
         String cpfNum = cpf.replace("-", "").replace(".", "");
@@ -190,12 +268,13 @@ public class DaoEstatico implements Dao {
             ///  cadastra novo funcionario
             staffs.add(p);
         }
-        
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
     
     
     
-    
+    /////////////////////////////
     public void SalvaPessoa(Pessoa p) {
         String cpf = formataCPF(p.getcpf());
         System.out.print(cpf);
@@ -212,7 +291,7 @@ public class DaoEstatico implements Dao {
     }
     
         
-    
+    ///////////////////////////////
     public void adicionarPessoa(Pessoa p) {
         pessoas.add(p);
     }
@@ -263,7 +342,7 @@ public class DaoEstatico implements Dao {
     }
     
     
-    
+    ///////////////////////////////////
     public void atualizarPessoa(Pessoa p) {
         // sinaliza que será feita uma busca
         int ondeMudar = -1;
@@ -299,7 +378,9 @@ public class DaoEstatico implements Dao {
         Produto p = new Produto(cardapio.get(item));
         p.setQuantidade(p.getQuantidade() - quantidade);
         cardapio.add(item, p);
-
+        
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
     //public void setItemPedido(Produto d){pedido.add(d);}
     
