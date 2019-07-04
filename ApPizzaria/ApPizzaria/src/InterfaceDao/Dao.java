@@ -33,9 +33,9 @@ public interface Dao  {
     
     public void SalvaStaff(Staff p);
     
-    public void SalvaPessoa(Pessoa p);
+    public void SalvaPessoa(Cliente p);
     
-    public void adicionarPessoa(Pessoa p);
+    public void adicionarPessoa(Cliente p);
     
     public Cliente buscarPessoaPorCPF(String cpf);
     
@@ -43,7 +43,7 @@ public interface Dao  {
     
     public boolean existePessoaPorCPF(String cpf);
     
-    public void atualizarPessoa(Pessoa p);
+    public void atualizarPessoa(Cliente p);
     
     public ArrayList<Produto> retornarCardapio();
     
@@ -51,5 +51,5 @@ public interface Dao  {
     
     public void retiraItemDoEstoque(int item, int quantidade);
     
-    public ArrayList<Produto> removeItemPedido(int item, ArrayList<Produto> p);
+    public ArrayList<Oferta> removeItemPedido(int item, ArrayList<Oferta> p);
 }

@@ -20,7 +20,7 @@ public class Caixa {
         if (!atendimentos.contains(this)){   
         }else{
             for (Atendimento atend : atendimentos){
-                for (Produto prod : atend.getPedido()){
+                for (Oferta prod : atend.getPedido()){
                     valorFaturado = valorFaturado +prod.getPreco()*prod.getQtda();
                 }
             }

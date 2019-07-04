@@ -25,7 +25,7 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
     
     int item = 0;
     int itemtela = 1;
-    ArrayList<Produto> pedido= new ArrayList();
+    ArrayList<Oferta> pedido= new ArrayList();
     boolean ApenasCadastroPessoas = false;
     boolean ApenasCadastroStaff = false;
     /**
@@ -176,7 +176,7 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         
         //cria uma lista temporaria
         DefaultListModel tmp = (DefaultListModel) listPedido.getModel();
-        for (Produto prod : atendimento.getPedido()){
+        for (Oferta prod : atendimento.getPedido()){
             item = prod.getItem();
             // adiciona no fim na lista auxiliar
             String x = String.format("%2d %-50s %-5s %10.2f", item, prod.getDescricao(), prod.getQtda(), prod.getPreco());
@@ -695,7 +695,7 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
         
         //altera o valor do item para coincidir com o item do pedido e altera a quantidade, conforme pedido
         Produto oProd = new Produto(item+1, prod.getPreco(), prod.getDescricao(),
-                quantidadeSelecionada ,quantidadeSelecionada ,prod.getUnidade() );
+                quantidadeSelecionada ,prod.getUnidade() );
         
         //System.out.println(""+oProd.getItem()+ " "+oProd.getDescricao() + " Subtotal:" + oProd.getPreco());
         
@@ -736,7 +736,7 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
     private void btSalvarPessoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btSalvarPessoaActionPerformed
        
         // cria a nova pessoa
-        Pessoa novaPessoa;
+        Cliente novaPessoa;
        
         if (textCpf.getText().equals("")){   
           // nao salva, nao faz nada.
@@ -745,7 +745,7 @@ public class Tela03_Atendimento extends javax.swing.JDialog {
             if (textObs.getText().equals("")){
                 
                 if (!ApenasCadastroStaff) {
-                    novaPessoa = (Cliente)new Cliente(textNome.getText(), textCpf.getText(),  textAreaEndereco.getText(), textFone.getText());
+                    novaPessoa = new Cliente(textNome.getText(), textCpf.getText(),  textAreaEndereco.getText(), textFone.getText());
                     dao.SalvaPessoa(novaPessoa);
                     if (!ApenasCadastroPessoas) {
                         btAtribuirClienteAoPedido.setEnabled(true);

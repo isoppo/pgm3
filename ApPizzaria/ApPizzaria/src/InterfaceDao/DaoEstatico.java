@@ -24,7 +24,7 @@ public class DaoEstatico implements Dao {
     // variáveis para uso *** interno e temporário *** do DAO
     HashMap dados = new HashMap();
     // objetos estáticos, para que quaisquer instâncias do DAO acessem os mesmos dados
-    static ArrayList<Pessoa> pessoas = new ArrayList();
+    static ArrayList<Cliente> pessoas = new ArrayList();
     static ArrayList<Staff> staffs = new ArrayList();
     static ArrayList<Cliente> clientes = new ArrayList();
     static ArrayList<Produto> cardapio= new ArrayList();
@@ -32,6 +32,7 @@ public class DaoEstatico implements Dao {
     static ArrayList<Atendimento> atendimentosAbertos= new ArrayList();
     static ArrayList<Atendimento> atendimentosEncerrado= new ArrayList();
     private Caixa caixa;
+    private Servico entrega;
 
     public void EscreveDadosHashMap(){
         dados.clear();
@@ -94,6 +95,7 @@ public class DaoEstatico implements Dao {
         cardapio.add(new Produto(10, 13, "Pizza Quatro Queijos Pequena", 20, "unid"));
         cardapio.add(new Produto(11, 18, "Pizza Quatro Queijos Media", 20, "unid"));
         cardapio.add(new Produto(12, 27, "Pizza Quatro Queijos Grande", 20, "unid"));
+        entrega = new Servico(0, 8, "Entrega");
         
         //popular o cadastro de clientes Cliente( String nome, String cpf, String endereco, String telefone ) {
         clientes.add(new Cliente("Fabio Silva", "000.555.333-11", "Rua das Favas, 123", "99941-5510"));
@@ -275,9 +277,9 @@ public class DaoEstatico implements Dao {
     
     
     /////////////////////////////
-    public void SalvaPessoa(Pessoa p) {
+    public void SalvaPessoa(Cliente p) {
         String cpf = formataCPF(p.getcpf());
-        System.out.print(cpf);
+        //System.out.print(cpf);
         p.setcpf(cpf);
      //  cadastra pessoa
         
@@ -288,26 +290,30 @@ public class DaoEstatico implements Dao {
             atualizarPessoa(p);
             
         }
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
     
         
     ///////////////////////////////
-    public void adicionarPessoa(Pessoa p) {
-        pessoas.add(p);
+    public void adicionarPessoa(Cliente p) {
+        clientes.add(p);
+        //salva dados no arquivo
+        SalvaDadosEmArquivo();
     }
 
   
     
     public Cliente buscarPessoaPorCPF(String cpf) {
-        
+        MontaListaPessoa();
         String cpfPesssaNum;      
-        for (Pessoa p : pessoas) {
+        for (Cliente p : pessoas) {
             cpfPesssaNum = p.getcpf().replace("-", "").replace(".", "");;
             if (p.getcpf().equals(cpf)) {
-                return (Cliente)p;
+                return p;
             } else {
                 if ( cpfPesssaNum.equals(cpf) ){
-                    return (Cliente)p;
+                    return p;
                 }
             }
         }
@@ -316,13 +322,13 @@ public class DaoEstatico implements Dao {
     
     public Staff buscarStaffPorCPF(String cpf) {
         String cpfPesssaNum;      
-        for (Pessoa p : staffs) {
+        for (Staff p : staffs) {
             cpfPesssaNum = p.getcpf().replace("-", "").replace(".", "");;
             if (p.getcpf().equals(cpf)) {
-                return (Staff)p;
+                return p;
             } else {
                 if ( cpfPesssaNum.equals(cpf) ){
-                    return (Staff)p;
+                    return p;
                 }
             }
         }
@@ -331,8 +337,9 @@ public class DaoEstatico implements Dao {
     
    
     public boolean existePessoaPorCPF(String cpf) {
+        MontaListaPessoa();
         // busca a pessoa pelo nome
-        for (Pessoa p : pessoas) {
+        for (Cliente p : pessoas) {
             if (p.getcpf().equals(cpf)) {
                 return true;
             }
@@ -343,21 +350,23 @@ public class DaoEstatico implements Dao {
     
     
     ///////////////////////////////////
-    public void atualizarPessoa(Pessoa p) {
+    public void atualizarPessoa(Cliente p) {
         // sinaliza que será feita uma busca
         int ondeMudar = -1;
         // busca a pessoa pelo nome
-        for (int i = 0; i < pessoas.size(); i++) {
-            if (pessoas.get(i).getcpf().equals(p.getcpf())) {
+        for (int i = 0; i < clientes.size(); i++) {
+            if (clientes.get(i).getcpf().equals(p.getcpf())) {
                 ondeMudar = i;
                 break;
             }
         }
         // se achou a pessoa pra mudar
         if (ondeMudar >= 0) {
-            pessoas.set(ondeMudar, p);
-            
-            
+            if( p instanceof Staff ){
+                SalvaStaff((Staff)p);
+            }else{
+                clientes.set(ondeMudar, p);
+            }
         }
     }
     
@@ -376,7 +385,7 @@ public class DaoEstatico implements Dao {
     
     public void retiraItemDoEstoque(int item, int quantidade) {
         Produto p = new Produto(cardapio.get(item));
-        p.setQuantidade(p.getQuantidade() - quantidade);
+        p.setQtda(p.getQtda() - quantidade);
         cardapio.add(item, p);
         
         //salva dados no arquivo
@@ -387,15 +396,15 @@ public class DaoEstatico implements Dao {
     
     
     
-    
-    public ArrayList<Produto> removeItemPedido(int item, ArrayList<Produto> p) {
-        ArrayList<Produto> pedido = new ArrayList();
+    @Override
+    public ArrayList<Oferta> removeItemPedido(int item, ArrayList<Oferta> p) {
+        ArrayList<Oferta> pedido = new ArrayList();
         for (int i=0; i<item; i++){
-        Produto prod = new Produto(p.get(i));
+        Produto prod = new Produto((Produto)p.get(i));
         pedido.add(prod);
         }
         for (int i=item+1; i<p.size(); i++){
-        Produto prod = new Produto(p.get(i));
+        Produto prod = new Produto((Produto)p.get(i));
         prod.setItem(i);
         pedido.add(prod);
         }

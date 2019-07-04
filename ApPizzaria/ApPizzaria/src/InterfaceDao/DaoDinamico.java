@@ -12,7 +12,7 @@ public class DaoDinamico implements Dao{
     
     // objetos estáticos, para que quaisquer instâncias do DAO
     // acessem os mesmos dados
-    static ArrayList<Pessoa> pessoas = new ArrayList();
+    static ArrayList<Cliente> pessoas = new ArrayList();
     static ArrayList<Staff> staffs = new ArrayList();
     static ArrayList<Cliente> clientes = new ArrayList();
     static ArrayList<Produto> cardapio= new ArrayList();
@@ -20,9 +20,10 @@ public class DaoDinamico implements Dao{
     static ArrayList<Atendimento> atendimentosAbertos= new ArrayList();
     static ArrayList<Atendimento> atendimentosEncerrado= new ArrayList();
     private Caixa caixa;
+    private Servico entrega; 
     
     public DaoDinamico() {
-        //popular o cardápio Produto(float preco, String descricao, float quantidade, String unidade)
+        //popular o cardápio Produto(int item, float preco, String descricao, float quantidade, String unidade)
         cardapio.add(new Produto(1, 10, "Coca Cola 2l", 20, "unid"));
         cardapio.add(new Produto(2, 5, "Coca Cola 600ml", 20, "unid"));
         cardapio.add(new Produto(3, 4, "Coca Cola lata", 20, "unid"));
@@ -35,6 +36,7 @@ public class DaoDinamico implements Dao{
         cardapio.add(new Produto(10, 13, "Pizza Quatro Queijos Pequena", 20, "unid"));
         cardapio.add(new Produto(11, 18, "Pizza Quatro Queijos Media", 20, "unid"));
         cardapio.add(new Produto(12, 27, "Pizza Quatro Queijos Grande", 20, "unid"));
+        entrega = new Servico(0, 8, "Entrega");
         
         //popular o cadastro de clientes Cliente( String nome, String cpf, String endereco, String telefone ) {
         clientes.add(new Cliente("Fabio Silva", "000.555.333-11", "Rua das Favas, 123", "99941-5510"));
@@ -49,26 +51,17 @@ public class DaoDinamico implements Dao{
         MontaListaPessoa();
     }
     
-    /**
-    // manipulação de pessoas
-    //public ArrayList<Pessoa> retornarPessoas() {
-    public void MontaPessoas() {
-        for(int i=0; i<staffs.size();i++) {
-        pessoas.add(staffs.get(i));}
-        for(int i=0; i<clientes.size();i++) {
-        pessoas.add(clientes.get(i));}
-        
-        //return pessoas;
-    }
-    */
+    @Override
     public void SalvaCaixa(Caixa a){
         this.caixa = a;
     }
     
+    @Override
     public Caixa ExtratoCaixa(){
         return this.caixa;
     }
     
+    @Override
     public void SalvaAtendimento(Atendimento p) {
         boolean atendimentoJaExiste = false;
         for (Atendimento atend : atendimentos){
@@ -82,6 +75,7 @@ public class DaoDinamico implements Dao{
         }
     }
     
+    @Override
     public void SubstituiAtendimento(Atendimento p ) {
         String item = p.getidAtendimento();
         //remove o atendimento (conforme o id passado por parametro) da lista de atendimentos
@@ -106,6 +100,7 @@ public class DaoDinamico implements Dao{
         this.atendimentosAbertos = abertos; 
     }
     
+    @Override
     public Atendimento getAtendimento(String id) {
         Atendimento x= new Atendimento();
         for (Atendimento atend : atendimentos){
@@ -116,10 +111,12 @@ public class DaoDinamico implements Dao{
         return x;
     }
     
+    @Override
     public ArrayList<Atendimento> getAtendimentos() {
          return atendimentos;
     }
     
+    @Override
     public ArrayList<Atendimento> getAtendimentosAbertos() {
         ArrayList<Atendimento> abertos = new ArrayList();
         for (Atendimento aten : atendimentos){
@@ -134,7 +131,7 @@ public class DaoDinamico implements Dao{
     
     
     
-    
+    @Override
     public ArrayList<Atendimento> getAtendimentosEncerrado() {
         ArrayList<Atendimento> fechado = new ArrayList();
         for (Atendimento aten : atendimentos){
@@ -146,6 +143,7 @@ public class DaoDinamico implements Dao{
          return fechado;
     }
     
+    @Override
     public void removeAtendimento(String item) {
        
         //remove o atendimento (conforme o id passado por parametro) da lista de atendimentos
@@ -169,6 +167,7 @@ public class DaoDinamico implements Dao{
         this.atendimentosAbertos = abertos; 
     }
     
+    @Override
     public void MontaListaPessoa(){
         pessoas.clear();
         for(int i=0; i<staffs.size();i++) {
@@ -177,6 +176,7 @@ public class DaoDinamico implements Dao{
         pessoas.add(clientes.get(i));}
     }
     
+    @Override
     public String formataCPF(String cpf){
         String cpfNum = cpf.replace("-", "").replace(".", "");
         if (cpf.length()>10){
@@ -184,6 +184,7 @@ public class DaoDinamico implements Dao{
         return cpf;
     }
     
+    @Override
     public void SalvaStaff(Staff p){
         String cpf = formataCPF(p.getcpf());
         p.setcpf(cpf);
@@ -206,10 +207,16 @@ public class DaoDinamico implements Dao{
         
     }
     
-    public void SalvaPessoa(Pessoa p) {
+    @Override
+    public void SalvaPessoa(Cliente p) {
+        /*
         String cpf = p.getcpf();
         String cpfNum = cpf.replace("-", "").replace(".", "");
         cpf = (cpfNum.substring(0, 3) +"." + cpfNum.substring(3, 6) +"." + cpfNum.substring(6, 9) +"-"+ cpfNum.substring(9, 11));
+        p.setcpf(cpf);
+        */
+        
+        String cpf = formataCPF(p.getcpf());
         p.setcpf(cpf);
      //  cadastra pessoa
         if (!existePessoaPorCPF(cpf)) {
@@ -222,46 +229,49 @@ public class DaoDinamico implements Dao{
     }
     
         
-    
-    public void adicionarPessoa(Pessoa p) {
-        pessoas.add(p);
+    @Override
+    public void adicionarPessoa(Cliente p) {
+        clientes.add(p);
     }
     
+    @Override
     public Cliente buscarPessoaPorCPF(String cpf) {
-        
+        MontaListaPessoa();
         String cpfPesssaNum;      
-        for (Pessoa p : pessoas) {
+        for (Cliente p : pessoas) {
             cpfPesssaNum = p.getcpf().replace("-", "").replace(".", "");;
             if (p.getcpf().equals(cpf)) {
-                return (Cliente)p;
+                return p;
             } else {
                 if ( cpfPesssaNum.equals(cpf) ){
-                    return (Cliente)p;
+                    return p;
                 }
             }
         }
         return new Cliente("Nao Encontrado", cpf, "","");
     }
     
+    @Override
     public Staff buscarStaffPorCPF(String cpf) {
         String cpfPesssaNum;      
-        for (Pessoa p : staffs) {
+        for (Staff p : staffs) {
             cpfPesssaNum = p.getcpf().replace("-", "").replace(".", "");;
             if (p.getcpf().equals(cpf)) {
-                return (Staff)p;
+                return p;
             } else {
                 if ( cpfPesssaNum.equals(cpf) ){
-                    return (Staff)p;
+                    return p;
                 }
             }
         }
         return new Staff("Nao Encontrado", cpf, "","","");
     }
     
-        
+    @Override    
     public boolean existePessoaPorCPF(String cpf) {
+        MontaListaPessoa();
         // busca a pessoa pelo nome
-        for (Pessoa p : pessoas) {
+        for (Cliente p : pessoas) {
             if (p.getcpf().equals(cpf)) {
                 return true;
             }
@@ -269,29 +279,34 @@ public class DaoDinamico implements Dao{
         // não achou? retorna falso
         return false;
     }
-    
-    public void atualizarPessoa(Pessoa p) {
+    @Override
+    public void atualizarPessoa(Cliente p) {
         // sinaliza que será feita uma busca
         int ondeMudar = -1;
-        // busca a pessoa pelo nome
-        for (int i = 0; i < pessoas.size(); i++) {
-            if (pessoas.get(i).getcpf().equals(p.getcpf())) {
+        // busca a pessoa pelo cpf
+        for (int i = 0; i < clientes.size(); i++) {
+            if (clientes.get(i).getcpf().equals(p.getcpf())) {
                 ondeMudar = i;
                 break;
             }
         }
         // se achou a pessoa pra mudar
         if (ondeMudar >= 0) {
-            pessoas.set(ondeMudar, p);
-            
+            if( p instanceof Staff ){
+                SalvaStaff((Staff)p);
+            }else{
+                clientes.set(ondeMudar, p);
+            }
             
         }
     }
     
+    @Override
     public ArrayList<Produto> retornarCardapio() {
         return cardapio;
     }
     
+    @Override
     public Produto buscarProduto(String produto) {
         for (Produto p : cardapio) {
             if (p.getDescricao().equals(produto)) {
@@ -301,35 +316,28 @@ public class DaoDinamico implements Dao{
         return new Produto(0, 0, "nao encontrado", 0 , "u" );
     }
     
+    @Override
     public void retiraItemDoEstoque(int item, int quantidade) {
         Produto p = new Produto(cardapio.get(item));
-        p.setQuantidade(p.getQuantidade() - quantidade);
+        p.setQtda(p.getQtda() - quantidade);
         cardapio.add(item, p);
 
     }
-    //public void setItemPedido(Produto d){pedido.add(d);}
     
-    
-    
-    
-    
-    public ArrayList<Produto> removeItemPedido(int item, ArrayList<Produto> p) {
-        ArrayList<Produto> pedido = new ArrayList();
+    @Override
+    public ArrayList<Oferta> removeItemPedido(int item, ArrayList<Oferta> p) {
+        ArrayList<Oferta> pedido = new ArrayList();
         for (int i=0; i<item; i++){
-        Produto prod = new Produto(p.get(i));
+        Produto prod = new Produto((Produto)p.get(i));
         pedido.add(prod);
         }
         for (int i=item+1; i<p.size(); i++){
-        Produto prod = new Produto(p.get(i));
+        Produto prod = new Produto((Produto)p.get(i));
         prod.setItem(i);
         pedido.add(prod);
         }
         return pedido;
     }
-    
-    
-    
-    
-    
+   
     
 }

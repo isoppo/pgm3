@@ -1,13 +1,22 @@
-
+                                                                                   
 package Objetos;
 
 /**
  * @author Felipe-Isoppo
  */
-public class Cliente extends Pessoa {
+public class Cliente  {
     
     private String endereco;
     private String telefone;
+    
+    private String nome;
+    private String cpf;
+    
+
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getcpf() { return cpf; }
+    public void setcpf(String cpf) { this.cpf = cpf; }
    
     public String getEndereco() { return endereco; }
     public void setEndereco(String e) {endereco = e; }
@@ -16,10 +25,10 @@ public class Cliente extends Pessoa {
     
     // construtor
     public Cliente( String nome, String cpf, String e, String t ) {
-        super( nome, cpf ); endereco = e; telefone = t; }
+        this.nome = nome; this.cpf = cpf ; endereco = e; telefone = t; }
     
     public Cliente(){
-        super( "", "" ); endereco = ""; telefone = "";
+        this.nome = ""; this.cpf = "" ; this.endereco = ""; this.telefone = "";
     }
    
 }

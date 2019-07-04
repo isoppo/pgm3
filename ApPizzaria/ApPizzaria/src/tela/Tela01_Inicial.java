@@ -9,7 +9,8 @@ import InterfaceDao.*;
  */
 public class Tela01_Inicial extends javax.swing.JFrame {
 
-    Dao dao = new DaoEstatico();
+    //Dao dao = new DaoEstatico();
+    Dao dao = new DaoDinamico();
     Caixa caixa = new Caixa();
     /**
      * Creates new form Tela01_Inicial

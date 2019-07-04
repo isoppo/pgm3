@@ -19,8 +19,6 @@ public class DaoAF  implements Serializable{
     public String caminhoArquivo;
     public HashMap dados = new HashMap();;
     
-    public DaoAF() { super();}
-    
     //Construtor
     DaoAF( String caminhoArquivo){
         this.caminhoArquivo = caminhoArquivo;
